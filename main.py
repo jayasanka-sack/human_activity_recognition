@@ -61,12 +61,12 @@ def read_data():
     global test_segments, test_labels
     column_names = ['activity',
                     'timestamp',
-                    'watch-accel-x',
-                    'watch-accel-y',
-                    'watch-accel-z',
                     'phone-accel-x',
                     'phone-accel-y',
-                    'phone-accel-z']
+                    'phone-accel-z',
+                    'watch-accel-x',
+                    'watch-accel-y',
+                    'watch-accel-z']
     print('Reading Data...')
     df = pd.read_csv('data_compact.csv', header=None, names=column_names)
     ndf = normalise_data(df)
