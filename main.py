@@ -19,7 +19,7 @@ activities = {
     "E": "standing"
 }
 TIME_PERIODS = 200
-STEP_DISTANCE = 100
+STEP_DISTANCE = 200
 test_segments = []
 test_labels = []
 
@@ -33,7 +33,7 @@ def create_segments_and_labels(dff, time_steps, step):
     # step = time_steps
     segments = []
     labels = []
-    accel_data = dff[['x-axis', 'y-axis', 'z-axis']]
+    accel_data = dff[['watch-accel-x', 'watch-accel-y', 'watch-accel-z']]
     for i in range(0, len(dff) - time_steps, step):
         values = accel_data.iloc[i:(i + time_steps)].values
         # Retrieve the most often used label in this segment
@@ -50,10 +50,10 @@ def create_segments_and_labels(dff, time_steps, step):
 def normalise_data(df):
     print('Normalising Data...')
     ndf = df.copy()
-    ndf['x-axis'] = (df['x-axis'] - normalization_min) / (normalization_max - normalization_min)
-    ndf['y-axis'] = (df['y-axis'] - normalization_min) / (normalization_max - normalization_min)
-    ndf['z-axis'] = (df['z-axis'] - normalization_min) / (normalization_max - normalization_min)
-    ndf = ndf.round({'x-axis': 4, 'y-axis': 4, 'z-axis': 4})
+    ndf['watch-accel-x'] = (df['watch-accel-x'] - normalization_min) / (normalization_max - normalization_min)
+    ndf['watch-accel-y'] = (df['watch-accel-y'] - normalization_min) / (normalization_max - normalization_min)
+    ndf['watch-accel-z'] = (df['watch-accel-z'] - normalization_min) / (normalization_max - normalization_min)
+    ndf = ndf.round({'watch-accel-x': 4, 'watch-accel-y': 4, 'watch-accel-z': 4})
     return ndf
 
 
@@ -61,9 +61,12 @@ def read_data():
     global test_segments, test_labels
     column_names = ['activity',
                     'timestamp',
-                    'x-axis',
-                    'y-axis',
-                    'z-axis']
+                    'watch-accel-x',
+                    'watch-accel-y',
+                    'watch-accel-z',
+                    'phone-accel-x',
+                    'phone-accel-y',
+                    'phone-accel-z']
     print('Reading Data...')
     df = pd.read_csv('data_compact.csv', header=None, names=column_names)
     ndf = normalise_data(df)
@@ -73,14 +76,14 @@ def read_data():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     read_data()
-    model = keras.models.load_model("model")
+    model = keras.models.load_model("watch")
     le = preprocessing.LabelEncoder()
     le.fit(labels)
     while True:
         index = int(input("Enter an index:"))
-        encoded_prediction = np.argmax(model.predict(np.array([test_segments[0]])), axis=1)
+        values = test_segments[index]
+        input_data = values.reshape(1, 200 * 3)
+        encoded_prediction = np.argmax(model.predict(input_data), axis=1)
         decoded_prediction = le.inverse_transform(encoded_prediction)[0]
         print("Activity: " + activities[test_labels[index]])
         print("Predicted Activity: " + activities[decoded_prediction])
-
-
