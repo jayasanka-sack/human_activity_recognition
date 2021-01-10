@@ -61,14 +61,11 @@ def read_data():
     global test_segments, test_labels
     column_names = ['activity',
                     'timestamp',
-                    'phone-accel-x',
-                    'phone-accel-y',
-                    'phone-accel-z',
                     'watch-accel-x',
                     'watch-accel-y',
                     'watch-accel-z']
     print('Reading Data...')
-    df = pd.read_csv('data_compact.csv', header=None, names=column_names)
+    df = pd.read_csv('test_user.csv', header=None, names=column_names)
     ndf = normalise_data(df)
     test_segments, test_labels = create_segments_and_labels(ndf, TIME_PERIODS, STEP_DISTANCE)
 
